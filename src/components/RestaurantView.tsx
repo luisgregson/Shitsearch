@@ -28,57 +28,45 @@ export class RestaurantView extends React.Component {
   };
 
   checkRestaurantId = (restaurantFilter: IRestaurantFilter): void => {
-    if (restaurantFilter.id === undefined) {
-      return;
-    }
-    const filteredRestaurants = this.state.restaurants.filter(data => {
-      if (data.id === restaurantFilter.id) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-    if (filteredRestaurants.length === 1) {
+    const filteredRestaurants = this.state.restaurants.filter(
+      data => data.id === restaurantFilter.id
+    );
+    if (filteredRestaurants.length >= 1) {
       this.setState({
         restaurants: [...filteredRestaurants]
       });
     }
   };
 
-  searchBox = (e: React.ChangeEvent<HTMLInputElement>) => {
+  filterRestaurants = (e: React.ChangeEvent<HTMLInputElement>) => {
     const id = parseInt(e.target.value, 10);
     this.checkRestaurantId({ id });
   };
 
-  fetchRestaurants = async () => {
-    const response = await getRestaurants();
-    return response;
-  };
-
   refresh = async () => {
-    const originalData = await this.fetchRestaurants();
+    const originalData = await getRestaurants();
     this.setState({
       restaurants: originalData
     });
   };
 
-  async componentDidMount() {
-    const data = await this.fetchRestaurants();
+  async componentWillMount() {
     this.setState({
-      restaurants: data
+      restaurants: await getRestaurants()
     });
   }
 
   render() {
+    const { restaurants } = this.state;
     return (
       <>
         <label>
           Search by id:
-          <input onChange={this.searchBox} />
+          <input onChange={this.filterRestaurants} />
         </label>
         <button onClick={this.refresh}>Clear</button>
         <Container>
-          {this.state.restaurants.map(row => (
+          {restaurants.map(row => (
             <li key={row.id}>
               <h2>{row.name}</h2>
               {row.rating}{" "}
