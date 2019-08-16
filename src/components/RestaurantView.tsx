@@ -74,7 +74,7 @@ export class RestaurantView extends React.Component {
         </label>
         <Container>
           {this.state.restaurants.map(row => (
-            <li>
+            <li key={row.id}>
               <h2>{row.name}</h2>
               {row.rating}{" "}
               <span role="img" aria-label="star">
