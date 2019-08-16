@@ -2,18 +2,12 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { getRestaurants } from "../utils/fetcher";
-import { Restaurant } from "../utils/restaurants";
-
-interface IRestaurantFilter {
-  id?: number;
-  name?: string;
-  dogFriendly?: boolean;
-  veganFriendly?: boolean;
-  rating?: number;
-}
+import { IRestaurant } from "../utils/restaurants";
+import RestaurantItem from "../components/RestaurantItem";
+import SearchBox from "../components/SearchBox";
 
 interface IRestaruantViewState {
-  restaurants: Restaurant[];
+  restaurants: IRestaurant[];
 }
 
 const Container = styled.ul`
@@ -27,74 +21,40 @@ export class RestaurantView extends React.Component {
     restaurants: []
   };
 
-  checkRestaurantId = (restaurantFilter: IRestaurantFilter): void => {
-    if (restaurantFilter.id === undefined) {
+  componentDidMount = async (): Promise<void> => await this.refresh();
+
+  checkRestaurantId = (id: number | undefined): void => {
+    if (!id) {
       return;
     }
-    const filteredRestaurants = this.state.restaurants.filter(data => {
-      if (data.id === restaurantFilter.id) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-    if (filteredRestaurants.length === 1) {
+    const restaurants = this.state.restaurants.filter(data => data.id === id);
+    this.setState({ restaurants });
+  };
+
+  searchBox = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const id = parseInt(e.target.value, 10);
+    this.checkRestaurantId(id);
+  };
+
+  refresh = async (): Promise<void> => {
+    try {
+      const PRestaurantData = await getRestaurants();
       this.setState({
-        restaurants: [...filteredRestaurants]
+        restaurants: PRestaurantData
       });
+    } catch (err) {
+      console.log(err);
+      // Or: throw new Error(err);
     }
   };
-
-  searchBox = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const id = parseInt(e.target.value, 10);
-    this.checkRestaurantId({ id });
-  };
-
-  fetchRestaurants = async () => {
-    const response = await getRestaurants();
-    return response;
-  };
-
-  refresh = async () => {
-    const originalData = await this.fetchRestaurants();
-    this.setState({
-      restaurants: originalData
-    });
-  };
-
-  async componentDidMount() {
-    const data = await this.fetchRestaurants();
-    this.setState({
-      restaurants: data
-    });
-  }
 
   render() {
     return (
       <>
-        <label>
-          Search by id:
-          <input onChange={this.searchBox} />
-        </label>
-        <button onClick={this.refresh}>Clear</button>
+        <SearchBox inputChange={this.searchBox} refresh={this.refresh} />
         <Container>
-          {this.state.restaurants.map(row => (
-            <li key={row.id}>
-              <h2>{row.name}</h2>
-              {row.rating}{" "}
-              <span role="img" aria-label="star">
-                ⭐️
-              </span>
-              <br />
-              {row.dogFriendly && (
-                <>
-                  <span role="img" aria-label="dog">
-                    🐶
-                  </span>{" "}
-                  friendly
-                </>
-              )}
-            </li>
+          {this.state.restaurants.map((row: IRestaurant) => (
+            <RestaurantItem restaurant={row} key={row.id} />
           ))}
         </Container>
       </>
