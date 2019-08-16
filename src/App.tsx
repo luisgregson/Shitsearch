@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { RestaurantView } from "./RestaurantView";
+import { RestaurantView } from "./views/RestaurantView";
 
 export const App = () => (
   <div className="App">
