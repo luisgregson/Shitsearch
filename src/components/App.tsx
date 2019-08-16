@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { RestaurantView } from "./RestaurantView";
+import { Restaurant } from "./RestaurantView";
 
 export const App = () => (
   <div className="App">
@@ -21,6 +21,6 @@ export const App = () => (
       make.
     </p>
     <p>Fork this sandbox and make it better!</p>
-    <RestaurantView />
+    <Restaurant />
   </div>
 );
