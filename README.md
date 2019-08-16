@@ -1,2 +1,0 @@
-# Shitsearch
-Created with CodeSandbox
