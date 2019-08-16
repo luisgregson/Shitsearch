@@ -13,7 +13,8 @@ interface IRestaurantFilter {
 }
 
 interface IRestaruantViewState {
-  restaurants: Restaurant[];
+  allRestaurants: Restaurant[];
+  filteredRestaurants: Restaurant[];
 }
 
 const Container = styled.ul`
@@ -24,30 +25,17 @@ const Container = styled.ul`
 
 export class RestaurantView extends React.Component {
   state: IRestaruantViewState = {
-    restaurants: []
+    allRestaurants: [],
+    filteredRestaurants: []
   };
 
-  checkRestaurantId = (restaurantFilter: IRestaurantFilter): void => {
-    if (restaurantFilter.id === undefined) {
-      return;
-    }
-    const filteredRestaurants = this.state.restaurants.filter(data => {
-      if (data.id === restaurantFilter.id) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-    if (filteredRestaurants.length === 1) {
-      this.setState({
-        restaurants: [...filteredRestaurants]
-      });
-    }
-  };
-
-  searchBox = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const id = parseInt(e.target.value, 10);
-    this.checkRestaurantId({ id });
+  search = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const restaurantName = e.target.value.toLowerCase();
+    const filteredRestaurants = this.state.allRestaurants.filter(restaurant =>
+      restaurant.name.toLowerCase().includes(restaurantName)
+    );
+    this.setState({ filteredRestaurants });
+    console.log(filteredRestaurants);
   };
 
   fetchRestaurants = async () => {
@@ -56,41 +44,44 @@ export class RestaurantView extends React.Component {
   };
 
   refresh = async () => {
-    const originalData = await this.fetchRestaurants();
     this.setState({
-      restaurants: originalData
+      filteredRestaurants: []
     });
   };
 
   async componentDidMount() {
-    const data = await this.fetchRestaurants();
+    const allRestaurants = await this.fetchRestaurants();
     this.setState({
-      restaurants: data
+      allRestaurants
     });
   }
 
   render() {
+    const { allRestaurants, filteredRestaurants } = this.state;
+    const restaurantList = filteredRestaurants.length
+      ? filteredRestaurants
+      : allRestaurants;
     return (
       <>
         <label>
-          Search by id:
-          <input onChange={this.searchBox} />
+          Search Restaurant:
+          <input onChange={this.search} />
         </label>
         <button onClick={this.refresh}>Clear</button>
         <Container>
-          {this.state.restaurants.map(row => (
-            <li key={row.id}>
-              <h2>{row.name}</h2>
-              {row.rating}{" "}
+          {restaurantList.map(restaurant => (
+            <li key={restaurant.id}>
+              <h2>{restaurant.name}</h2>
+              {restaurant.rating}
               <span role="img" aria-label="star">
                 ⭐️
               </span>
               <br />
-              {row.dogFriendly && (
+              {restaurant.dogFriendly && (
                 <>
-                  <span role="img" aria-label="dog">
+                  <span role="img" aria-label="dog-friendly">
                     🐶
-                  </span>{" "}
+                  </span>
                   friendly
                 </>
               )}
