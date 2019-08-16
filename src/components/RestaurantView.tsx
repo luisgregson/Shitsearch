@@ -31,9 +31,13 @@ export class RestaurantView extends React.Component {
     if (restaurantFilter.id === undefined) {
       return;
     }
-    const filteredRestaurants = this.state.restaurants.filter(
-      data => data.id === restaurantFilter.id
-    );
+    const filteredRestaurants = this.state.restaurants.filter(data => {
+      if (data.id === restaurantFilter.id) {
+        return true;
+      } else {
+        return false;
+      }
+    });
     if (filteredRestaurants.length === 1) {
       this.setState({
         restaurants: [...filteredRestaurants]
@@ -69,9 +73,10 @@ export class RestaurantView extends React.Component {
     return (
       <>
         <label>
+          Search by id:
           <input onChange={this.searchBox} />
-          <button onClick={this.refresh}>Clear</button>
         </label>
+        <button onClick={this.refresh}>Clear</button>
         <Container>
           {this.state.restaurants.map(row => (
             <li key={row.id}>
