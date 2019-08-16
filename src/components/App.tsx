@@ -7,7 +7,7 @@ export const App = () => (
     <h1>Welcome to Typescript shitsearch</h1>
     <p>
       The idea is see if you can improve the readability and maintainability of
-      the code. jack
+      the code. jack testet st
     </p>
     <p>
       Currently the code works fine, but there are some improvements that we can
